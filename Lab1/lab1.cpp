@@ -34,7 +34,7 @@ double euclidianDistance(vector<double>& p1, vector<double>& p2){
 int main(){
 
     //vector<int> dimensiones = {10,50,100,500,1000,2000,5000};
-    int d = 5000;
+    int d = 5000; // Aqui cambiamos la dimension 
 
     vector<vector<double>> points = createPoints(100,d);
     vector<double> distances;
