@@ -19,7 +19,7 @@ plt.hist(distancias_array, bins=20, alpha=0.75, color='skyblue', rwidth=0.8, edg
 plt.title('Histograma de la distancias con dimension 5000')
 plt.xlabel('Distancia')
 plt.ylabel('Frecuencia')
-plt.xlim(0,30)
+plt.xlim(0,30) # Viendo el rango de numeros que crea editamos de que punto a que punto va para que se vea en el gráfico
 plt.ylim(0,700)
 plt.grid(True)
 plt.show()
