@@ -14,8 +14,6 @@ struct Point {
     Point(int a, int b, int c) : x(a), y(b), z(c) {}
 };
 
-// Definir cuántos puntos puede almacenar un nodo antes de dividirse.
-//const int MAX_POINTS = 4;
 
 class Octree {
 private:
@@ -47,12 +45,10 @@ Octree::Octree(Point bottomLeft, double h) : bottomLeft(bottomLeft), h(h), nPoin
     }
 }
 
-// Subdivide el nodo en 8 hijos.
 void Octree::octant() {
     
     double half_h = h / 2;
 
-    // Generar los 8 hijos del nodo actual.
     children[0] = new Octree(Point(bottomLeft.x, bottomLeft.y, bottomLeft.z), half_h);
     children[1] = new Octree(Point(bottomLeft.x + half_h, bottomLeft.y, bottomLeft.z), half_h);
     children[2] = new Octree(Point(bottomLeft.x, bottomLeft.y + half_h, bottomLeft.z), half_h);
@@ -63,23 +59,19 @@ void Octree::octant() {
     children[7] = new Octree(Point(bottomLeft.x + half_h, bottomLeft.y + half_h, bottomLeft.z + half_h), half_h);
 }
 
-// Función para verificar si un punto existe en el Octree.
 bool Octree::exist(const Point &p) {
-    // Verificar si el punto está dentro del espacio definido por este nodo.
     if (p.x < bottomLeft.x || p.x >= bottomLeft.x + h ||
         p.y < bottomLeft.y || p.y >= bottomLeft.y + h ||
         p.z < bottomLeft.z || p.z >= bottomLeft.z + h) {
         return false;
     }
     
-    // Verificar los puntos en el nodo actual.
     for (const Point &point : points) {
         if (point.x == p.x && point.y == p.y && point.z == p.z) {
             return true;
         }
     }
     
-    // Verificar en los hijos.
     if (children[0] != nullptr) {
         for (int i = 0; i < 8; ++i) {
             if (children[i]->exist(p)) {
@@ -91,26 +83,20 @@ bool Octree::exist(const Point &p) {
     return false;
 }
 
-// Función para insertar un punto en el Octree.
 void Octree::insert(const Point &p) {
-    // Verificar si el punto está dentro del espacio definido por este nodo.
     if (p.x < bottomLeft.x || p.x >= bottomLeft.x + h ||
         p.y < bottomLeft.y || p.y >= bottomLeft.y + h ||
         p.z < bottomLeft.z || p.z >= bottomLeft.z + h) {
-        return; // Punto fuera del rango del nodo.
+        return; 
     }
     
-    // Si el nodo no tiene hijos y tiene espacio, agregar el punto aquí.
     if (nPoints < 4) {
         points.push_back(p);
         nPoints++;
     } else {
-        // Si no hay hijos aún, dividir el nodo.
         if (children[0] == nullptr) {
             octant();
         }
-        
-        // Insertar el punto en el subnodo adecuado.
         for (int i = 0; i < 8; ++i) {
             children[i]->insert(p);
         }
@@ -118,47 +104,36 @@ void Octree::insert(const Point &p) {
 }
 
 
-// Función para encontrar el punto más cercano dentro de un radio.
 Point Octree::find_closest(const Point &p, int radius) {
-    // Definir una distancia inicial muy grande.
     double minDist = INT_MAX;
-    Point near = Point(0, 0, 0); // Valor por defecto para el punto más cercano.
+    Point near = Point(0, 0, 0);
 
-    // Recorrer puntos en el nodo actual.
     for (const Point &point : points) {
-        // Ignorar el punto si es el mismo que el de consulta.
         if (point.x == p.x && point.y == p.y && point.z == p.z) {
             continue;
         }
 
-        // Calcular la distancia entre el punto de consulta y el punto actual.
         double dist = sqrt(pow(p.x - point.x, 2) +
                            pow(p.y - point.y, 2) +
                            pow(p.z - point.z, 2));
 
-        // Actualizar el punto más cercano si encontramos una distancia menor.
         if (dist < minDist) {
             minDist = dist;
             near = point;
         }
     }
 
-    // Comprobar en los nodos hijos.
     if (children[0] != nullptr) {
         for (int i = 0; i < 8; ++i) {
-            // Llamada recursiva para encontrar el punto más cercano en los hijos.
             Point childClosest = children[i]->find_closest(p, radius);
             
-            // Ignorar el punto de consulta en los hijos.
             if (childClosest.x == p.x && childClosest.y == p.y && childClosest.z == p.z) {
                 continue;
             }
 
-            // Calcular la distancia al punto más cercano encontrado en los hijos.
             double dist = sqrt(pow(p.x - childClosest.x, 2) +
                                pow(p.y - childClosest.y, 2) +
                                pow(p.z - childClosest.z, 2));
-            // Actualizar el punto más cercano si encontramos una distancia menor.
             if (dist < minDist) {
                 minDist = dist;
                 near = childClosest;
@@ -166,15 +141,13 @@ Point Octree::find_closest(const Point &p, int radius) {
         }
     }
 
-    // Si el punto más cercano es el mismo que el de consulta, devolver un punto especial.
     if (near.x == p.x && near.y == p.y && near.z == p.z) {
-        return Point(0, 0, 0); // Punto especial indicando que no se encontró un punto diferente.
+        return Point(0, 0, 0); 
     }
 
     return near;
 }
 
-// Función para leer puntos desde un archivo CSV e insertarlos en el Octree.
 void readCSV(const string &filename, Octree &octree) {
     ifstream file(filename);
     string line;
@@ -197,16 +170,13 @@ void readCSV(const string &filename, Octree &octree) {
 }
 
 int main() {
-    // Crear un Octree con bottomLeft en (-500, -500, -500) y un lado de 1000 unidades.
     Point bottomLeft(-500, -500, -500);
     double SL = 1000;
     Octree octree(bottomLeft, SL);
 
-    // Leer puntos desde un archivo CSV y agregarlos al Octree.
     string filename = "C:/Users/cesar/Desktop/DS-EDA/Lab2/points1.csv";
     readCSV(filename, octree);
 
-    // Verificar si un punto existe en el Octree.
     Point queryPoint(155,208,47);
     if (octree.exist(queryPoint)) {
         cout << "El punto (" << queryPoint.x << ", " << queryPoint.y << ", " << queryPoint.z << ") existe en el Octree." <<endl;
@@ -214,7 +184,6 @@ int main() {
         cout << "El punto no existe en el Octree." << endl;
     }
 
-    // Encontrar el punto más cercano a otro punto.
     Point nearest = octree.find_closest(queryPoint, 100);
     if (nearest.x == 0 && nearest.y == 0 && nearest.z == 0) {
         cout << "No se pudo encontrar ningun punto cercano.\n";
