@@ -1,8 +1,0 @@
-construir raiz hace un pca y subdivide en dos grupos y cada thread se encarga de construir el  hijo izquierdo y el hijo derecho
-cada vez que se baja en el arbol se hace un pca para tratar de hacer una distribucion uniforme de los grupos.
-En una base de datos no importa que tan rapido se construya sino consultas rapidas
-
-
-mi pca lo que hace es evalua todas las dimensiones de los puntos y considera cual es la dimension con una mayor varianza,
-y en esa dimension genera el corte en base a la media, esto se realiza en cada nivel del arbol para tener una buena dispersion de datos, 
-y esto lo hacemos para optimizar tiempo de consultas
